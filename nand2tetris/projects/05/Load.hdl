@@ -1,0 +1,20 @@
+CHIP Load {
+
+	IN zr,ng,address[3];
+	OUT out;
+	
+	PARTS:
+	Not(in=zr,out=out5);
+	Not(in=out5,out=out2);
+	Not(in=ng,out=out3);
+	Not(in=out3,out=out4);
+	And(a=out5,b=out3,out=out1);
+	Not(in=out1,out=out6);
+	Mux(a=false,b=out1,sel=address[0],out=a);
+	Mux(a=out2,b=out3,sel=address[0],out=b);
+	Mux(a=out4,b=out5,sel=address[0],out=c);
+	Mux(a=out6,b=true,sel=address[0],out=d);
+	Mux(a=a,b=b,sel=address[1],out=p);
+	Mux(a=c,b=d,sel=address[1],out=q);
+	Mux(a=p,b=q,sel=address[2],out=out);
+}

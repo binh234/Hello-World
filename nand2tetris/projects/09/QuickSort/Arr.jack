@@ -1,0 +1,73 @@
+class Arr {
+	field Array arr;
+	field int size;
+    /** Constructs a new Array of the given size. */
+    constructor Arr new(int Asize) {
+		var Array sum;
+		if(Asize>0){
+			let size=Asize;
+			let sum=Array.new(Asize);
+			let arr=sum;
+		}
+		return this;
+    }
+
+    /** Disposes this array. */
+    method void dispose() {
+		do Memory.deAlloc(this);
+		return;
+    }
+	
+	method int idx(int m,int n){
+		var int k;
+		var int i;
+		let i=m+1;
+		let k=arr[m];
+		if(~(m<n)&~(n<m)){
+			return size;
+		}
+		while(~(i>n)){
+			if(k<arr[i]){
+				return i;
+			}
+			let i=i+1;
+		}
+		return m;
+	}
+	
+	method int Parsing(int key,int m,int n){
+		var int l;
+		var int r;
+		var int swap;
+		let l=m;
+		let r=n;
+		while(~(r<l)){
+			while(arr[l]<key){
+				let l=l+1;
+			}
+			while(~(arr[r]<key)){
+				let r=r-1;
+			}
+			if(l<r){
+				let swap=arr[l];
+				let arr[l]=arr[r];
+				let arr[r]=swap;
+			}
+		}
+		return l;
+	}
+	
+	method void QuickSort(int m,int n){
+		var int k;
+		var int key;
+		var int idx;
+		let idx=idx(m,n);
+		if(idx<size){
+		let key=arr[idx];
+		let k=Parsing(key,m,n);
+		do QuickSort(m,k);
+		do QuickSort(k+1,n);
+		}
+		return;
+	}
+}

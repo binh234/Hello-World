@@ -1,0 +1,71 @@
+/**
+ * A graphical Pong bat. 
+ * Displayed as a filled horizontal rectangle that has 
+ * a screen location, a width and a height.
+ * Has methods for drawing, erasing, moving left and right, 
+ * and changing its width (to make the hitting action more challenging).
+ * This class should have been called "paddle", following the 
+ * standard Pong terminology. But, unaware of this terminology,
+ * we called it "bat", and then decided to stick to it. 
+ */
+class Block {
+
+    field int x, y;           // the bat's screen location
+	field boolean exist;
+
+    /** Constructs a new bat with the given location and width. */
+    constructor Block new(int Ax, int Ay) {
+        let x = Ax;
+        let y = Ay;
+		let exist=true;
+        do show();
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Shows the bat. */
+    method void show() {
+        do Screen.setColor(true);
+        do draw();
+        return;
+    }
+
+    /** Hides the bat. */
+    method void hide() {
+        do Screen.setColor(false);
+        do draw();
+		let exist=false;
+        return;
+    }
+
+    /** Draws the bat. */
+    method void draw() {
+        do Screen.drawRectangle(x, y, x + 60, y + 16);
+        return;
+    }
+	
+	method int getLeft(){
+		return x;
+	}
+	
+	method int getRight(){
+		return x+60;
+	}
+	
+	method int getTop(){
+		return y;
+	}
+	
+	method int getBottom(){
+		return y+16;
+	}
+	
+	method boolean isExist(){
+		return exist;
+	}
+}

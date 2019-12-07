@@ -1,0 +1,14 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: tools/Main.jack
+
+// Inputs some numbers and computes their average
+class Main {
+	function void main(){
+	var int c;
+	let c=5;
+	do Output.printInt(c);
+	return;
+	}
+}
