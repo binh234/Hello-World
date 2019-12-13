@@ -1,0 +1,97 @@
+class SnakeGame {
+	field Snake snake;
+	field boolean exitGame;
+	
+	//Creates new game
+	constructor SnakeGame new() {
+		do Screen.clearScreen();
+		let snake = Snake.new(50);
+		let exitGame=false;
+		do Screen.drawLine(0,236,511,236);
+		return this;
+	}
+	
+	//Starts game
+	method void start(){
+		var boolean start;
+		var char key;
+		
+		let start=true;
+		while(~exitGame){
+			do run();
+			let start = false;
+			let key = 0;
+			while((key=0)&(~start)){
+				let key=Keyboard.keyPressed();
+				//Enter to restart game
+				if(key=128){
+					let start=true;
+					do Screen.clearScreen();
+					do snake.reset();
+				}
+				//Q key to exit
+				if(key=81){
+					let exitGame=true;
+					let start=true;
+				}
+				while(~(key = 0)&(~start)){
+					let key=Keyboard.keyPressed();
+					do Sys.wait(50);
+				}
+			}
+		}
+		
+		return;
+	}
+	
+	//Runs the game
+	method void run() {
+		var char key;
+		var int direction;
+		var boolean moved,exit;
+		
+		let exit = false;
+		while ((~exit) & (key = 0)) {
+				let key = Keyboard.keyPressed();
+				let moved = snake.move(0);
+				let exit = ~moved;
+			// Q key to exit
+			if (key = 81) {
+				let exit = true;
+				let exitGame = true;
+			}
+			// Up arrow - move up
+			if (key = 131) {
+				let direction = 1;
+			}
+			// Down arrow - move down
+			if (key = 133) {
+				let direction = 2;
+			}
+			// Left arrow - move left
+			if (key = 130) {
+				let direction = 3;
+			}
+			// Right arrow - move right
+			if (key = 132) {
+				let direction = 4;
+			}
+
+			// while key is being pressed
+			while (~(key = 0)) {
+				let key = Keyboard.keyPressed();
+				let moved = snake.move(direction);
+				let exit = ~moved;
+			}
+		}
+		
+		return;
+	}
+
+	//Releases memory
+	method void dispose() {
+		do snake.dispose();
+		do Memory.deAlloc(this);
+		return;
+	}
+}

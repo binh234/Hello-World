@@ -8,13 +8,33 @@
  * Note: Jack compilers implement multiplication and division using OS method calls.
  */
 class Math {
+	static Array Binary;
 
     /** Initializes the library. */
     function void init() {
+	var int i,value;
+	
+	let i=0;
+	let value=1;
+	let Binary=Array.new(16);
+	while(i<16){
+		let Binary[i]=value;
+		let i=i+1;
+		let value=value+value;
+	}
+	return;
     }
+	
+	function boolean getBit(int x,int i){
+		return ~((x & Binary[i]) = 0);
+	}
 
     /** Returns the absolute value of x. */
     function int abs(int x) {
+		if(x<0){
+			let x=-x;
+			}
+			return x;
     }
 
     /** Returns the product of x and y. 
@@ -23,6 +43,19 @@ class Math {
      *  the Jack expressions x*y and multiply(x,y) return the same value.
      */
     function int multiply(int x, int y) {
+	var int i,sum;
+	var int shiftX;
+	
+	let shiftX=x;
+	let sum=0;
+	while(i<16){
+		if(Math.getBit(y,i)){
+			let sum=sum+shiftX;
+			}
+		let i=i+1;
+		let shiftX=shiftX+shiftX;
+	}
+	return sum;
     }
 
     /** Returns the integer part of x/y.
@@ -31,17 +64,83 @@ class Math {
      *  the Jack expressions x/y and divide(x,y) return the same value.
      */
     function int divide(int x, int y) {
+	var int q,res;
+	var boolean pos;
+	
+	if(y=0){
+		do Sys.error(3);
+	}
+	let pos = ((x < 0) = (y < 0));
+	let x = Math.abs(x); 
+    let y = Math.abs(y);
+	if(x<y){
+		return 0;
+	}
+	let q=x/(y+y);
+	if (x-((q+q)*y)<y){
+		let res= q+q;
+		}
+	else{
+		let res= q+q+1;
+	}
+	if(pos){
+		return res;
+		}
+	else{
+		return -res;
+		}
     }
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {
+	var int result, j, y, temp;
+
+		if (x < 0){
+			do Sys.error(4);
+		}
+		if (x=0){
+			return 0;
+		}
+
+		let result = 0;
+		let j = 7;
+		
+		while (~(j < 0)){
+			let y = result + Binary[j];
+			let temp = y * y;
+			
+			if (~(temp > x)){
+				let result = y;
+			}
+
+			let j = j - 1;
+		}
+		
+		return result;
     }
 
     /** Returns the greater number. */
     function int max(int a, int b) {
+	if(a<b){
+		return b;
+	}
+	else{
+		return a;
+	}
     }
 
     /** Returns the smaller number. */
     function int min(int a, int b) {
+	if(a>b){
+		return b;
+	}
+	else{
+		return a;
+	}
     }
+	
+	/** Returns 2^n. */
+	function int powerTwo(int n){
+		return Binary[n];
+	}
 }

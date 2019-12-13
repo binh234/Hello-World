@@ -1,0 +1,12 @@
+  
+class Main {
+	function void main() {
+		var SnakeGame game;
+
+		let game = SnakeGame.new();
+		do game.start();
+		do game.dispose();
+
+		return;
+	}
+}

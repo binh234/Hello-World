@@ -1,0 +1,105 @@
+class SnakePart {
+	field int x; // x position of snake part
+	field int y; // y position of snake part
+	field int direction; // 1(move up), 2(move down), 3(move left), 4(move right)
+	field int length; // size of the snake part
+	
+	//Creates new snake part
+	constructor SnakePart new(int nX, int nY, int nLength, int nDirection) {
+		let x = nX;
+		let y = nY;
+		let length = nLength;
+		let direction = nDirection;
+		do draw();
+		return this;
+	}
+
+	//Releases data
+	method void dispose() {
+		do Memory.deAlloc(this);
+		return;
+	}
+
+	//Shows the snake part
+	method void draw() {
+		do Screen.setColor(true);
+		do Screen.drawRectangle(x, y, x + length, y + length);
+		return;
+	}
+	
+	//Hides the snake part
+	method void hide(){
+		do Screen.setColor(false);
+		do Screen.drawRectangle(x, y, x + length, y + length);
+		return;
+	}
+	
+	//Snake part movement
+	method boolean move() {
+		// Moves up
+		if (direction = 1) {
+			if ((y - length) > 4) {
+				let y = y - 10;
+				}
+			return true;
+		}
+		// Moves down
+		if (direction = 2) {
+			if ((y + length) < 226) {
+				let y = y + 10;
+			}
+			return true;
+		}
+		// Moves left
+		if (direction = 3) {
+			if ((x - length) > 4) {
+				let x = x - 10;
+			}
+			return true;
+				
+		}
+		// Moves right
+		if (direction = 4) {
+			if ((x + length) < 496) {
+				let x = x + 10;
+			}
+			return true;
+		}
+		
+		return false;
+	}
+	
+	//Checks if two parts meet
+	method boolean isCrash(SnakePart spart){
+		var int sx,sy;
+		
+		let sx=spart.getX();
+		let sy=spart.getY();
+		if((Math.abs(x-sx) < 6) & (Math.abs(y-sy )< 6)){
+			return true;
+		}
+		
+		return false;
+	}
+
+	//Gets direction of snake part
+	method int getDirection() {
+		return direction;
+	}
+	
+	//Gets the snake part's left edge
+	method int getX() {
+		return x;
+	}
+	
+	//Gets the snake part's top edge
+	method int getY() {
+		return y;
+	}
+	
+	//Sets direction for the snake part
+	method void setDirection(int nDirection) {
+		let direction = nDirection;
+		return;
+	}
+}

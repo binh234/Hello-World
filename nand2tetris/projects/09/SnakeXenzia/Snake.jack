@@ -1,0 +1,267 @@
+class Snake {
+	field Array snakeparts;  			//Parts of snake
+	field int maxlength, currlength;	//max length and current length of snake
+	field int foodX, foodY;				//locations of current food on the screen 
+	field int random1, random2;			//uses to random locations
+	field int score;					//Game score
+	field int highScore,lastHighScore;  //Game high score
+
+	//Creates new snake
+	constructor Snake new(int nLength) {
+		let currlength = 5;
+		let maxlength = nLength;
+		let snakeparts = Array.new(maxlength);
+		let foodX = 15;
+		let foodY = 25;
+		let random1 = 20;
+		let random2 = 40;
+		let highScore=0;
+		let lastHighScore=0;
+		
+		do initialScore();
+		do createFirst();
+		do draw();
+		do drawFood();
+		return this;
+	}
+	
+	//Releases data
+	method void dispose() {
+		var int n;
+		var SnakePart sl;
+		
+		let n = 0;
+		while (n < currlength) {
+			let sl = snakeparts[n];
+			do sl.dispose();
+			let n = n + 1;	
+		}
+		do snakeparts.dispose();
+		do Memory.deAlloc(this);
+		
+		return;
+	}
+
+	//Creates the first four parts of the snake
+	method void createFirst() {
+		var int startx, starty, startdirection;
+		var int n;
+		
+		let startx = 20;
+		let starty = 20;
+		// Starts to the right
+		let startdirection = 4;
+		let n = 0;
+		while (n < currlength) {
+			let snakeparts[n] = SnakePart.new(startx + (n * 10), starty, 5, startdirection);
+			let n = n + 1;
+		}
+		
+		return;
+	}
+
+	//Checks if can move in that direction (e.g. if moving left, cannot move right)
+	method boolean movable(int current, int new) {
+		if (new = 0) {
+			return true;
+		}
+		if (current = new) {
+			return false;
+		}
+		if (((current + new) = 3) | ((current + new) = 7)) {
+			return false;
+		}
+		return true;
+	}
+	
+	//Snake's movement
+	method boolean move(int direction) {
+		var int n;
+		var SnakePart first;
+		var SnakePart f1, f2;
+		var int firstDirection;
+		var int firstX, firstY;
+		var boolean movable;
+		var boolean gameEnd;
+
+		let gameEnd = checkGameEnd();
+		if (gameEnd){
+			do Screen.clearScreen();
+			if(score>lastHighScore){
+				let lastHighScore=score;
+				do Output.moveCursor(8, 23);
+				do Output.printString("New high score!!");
+			}
+			else{
+				do Output.moveCursor(8, 27);
+				do Output.printString("Game Over!");
+			}
+			do Output.moveCursor(9, 23);
+			do Output.printString("Your score is: ");
+			do Output.printInt(score);
+			do Output.moveCursor(12, 19);
+			do Output.printString("Press Enter to play again.");
+			do Output.moveCursor(13, 20);
+			do Output.printString("Press Q to exit the game.");
+			return false; 
+		}
+		let n = 0;
+		let first = snakeparts[currlength-1];
+		let firstDirection = first.getDirection();
+		let movable = movable(firstDirection, direction);
+		if (~movable){
+			return true; 
+		}
+		while (n < (currlength-1)) {
+			let f1 = snakeparts[n];
+			let f2 = snakeparts[n+1];
+			do f1.setDirection(f2.getDirection());
+			let n = n + 1;
+		}
+		if (~(direction = 0)) {
+			do first.setDirection(direction);
+		}
+		let n = 0;
+		let f1 = snakeparts[0];
+		do f1.hide();
+		while (n < currlength) {	//move snakeparts
+			let f1 = snakeparts[n];
+			do f1.move();
+			let n = n + 1;
+		}
+		do f1.draw();
+		let firstX = first.getX();
+		let firstY = first.getY();
+		if ((firstX < (foodX + 5)) & (firstX > (foodX - 5)) & (firstY > (foodY - 5)) & (firstY < (foodY + 5))) {	//checks to eat food
+			let firstDirection = first.getDirection();
+			do eat(firstDirection, firstX, firstY);		
+			do increaseScore();
+		}
+		do Sys.wait(60);
+		return true;
+	}
+	
+	//Checks if the snake hits the wall or eats its body
+	method boolean checkGameEnd() {
+		var SnakePart head;
+		var int headX,headY;
+		var int n;
+		
+		let head = snakeparts[currlength-1];
+		let headX = head.getX();
+		let headY = head.getY();
+		let n=0;
+		if ((headX < 5) | (headX > 500) | (headY < 5) | (headY > 220)) {
+			return true;
+		}
+		while(n < (currlength-2)){
+			if (head.isCrash(snakeparts[n])){
+				return true;
+			}
+			let n=n+1;
+		}
+		
+		return false;
+	}
+
+	//Eats foodY
+	method void eat(int firstDirection, int firstX, int firstY) {
+		var int x;
+		var int y;
+		
+		if (currlength < maxlength) {
+			if (firstDirection = 1) {
+				let snakeparts[currlength] = SnakePart.new(firstX, firstY - 10, 5, firstDirection);
+			}
+			if (firstDirection = 2) {
+				let snakeparts[currlength] = SnakePart.new(firstX, firstY + 10, 5, firstDirection);
+			}
+			if (firstDirection = 3) {
+				let snakeparts[currlength] = SnakePart.new(firstX - 10, firstY, 5, firstDirection);
+			}
+			if (firstDirection = 4) {
+				let snakeparts[currlength] = SnakePart.new(firstX + 10, firstY, 5, firstDirection);
+			}
+			let currlength = currlength + 1;
+		}
+		else {
+			return;
+		}
+		do drawFood();
+		
+		return;
+	}
+
+	//Draw food on the screen, in randomly selected positions
+	method void drawFood() {
+		var int nX;
+		var int nY;
+		
+		let nX = random1 * foodX + random2;
+		let foodX = nX - ((nX / 480) * 480) + 10;
+		let nY = random1 * foodY + random2;
+		let foodY = nY - ((nY / 220) * 220) + 10;
+		do Screen.setColor(true);
+		do Screen.drawRectangle(foodX, foodY, foodX + 5, foodY + 5);
+		return;
+	}
+
+	
+	//Draw this snake
+	method void draw() {
+		var SnakePart spart;
+		var int n;
+		
+		let n = 0;
+		while (n < currlength) {
+			let spart = snakeparts[n];
+			do spart.draw();
+			let n = n + 1;
+		}
+		return;
+	}
+	
+	//Initials game score
+	method void initialScore(){
+		let score=0;
+		do Output.moveCursor(22, 1);
+		do Output.printString("Score: 0");
+		do Output.moveCursor(22, 48);
+		do Output.printString("High Score: ");
+		do Output.printInt(highScore);
+		return;
+	}
+	
+	//Increase score, called when snake eats a foodY
+	method void increaseScore() {
+		let score = score + 5;
+		do Output.moveCursor(22,8);
+		do Output.printInt(score);
+		if(highScore<score){
+			let highScore=score;
+			do Output.moveCursor(22,60);
+			do Output.printInt(score);
+		}
+		return;
+	}
+	
+	//Release data before restart game
+	method void reset(){
+		var int n;
+		var SnakePart sl;
+		
+		let n = 0;
+		while (n < currlength) {
+			let sl = snakeparts[n];
+			do sl.dispose();
+			let n = n + 1;	
+		}
+		let currlength=5;
+		do initialScore();
+		do createFirst();
+		do draw();
+		do drawFood();
+		do Screen.drawLine(0,236,511,236);
+		return;
+	}
+}
