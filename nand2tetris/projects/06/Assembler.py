@@ -25,7 +25,7 @@ if len(sys.argv)!=2:
 else:
     try:
         with open(sys.argv[1], 'r') as fin:         #Open file
-            contents = fin.read()
+            contents = fin.read()+'\n'
         contents=re.sub(r'(//(.)*?\n)|(/\*(.)*?\*/)','',contents,flags=re.DOTALL)    #Remove comments in .asm file
         contents=contents.strip()
         contents=re.sub(r'\n\s+','',contents)       #Remove spaces in .asm file
