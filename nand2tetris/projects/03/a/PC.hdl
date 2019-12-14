@@ -17,10 +17,9 @@ CHIP PC {
 
     PARTS:
     // Put your code here:
-	DMux8Way(in=true,sel[2]=reset,sel[1]=load,sel[0]=inc,a=a,b=b,c=c,d=d,e=e,f=f,g=g,h=h);
-	Not16(in=true,out=oute,out=outf,out=outg,out=outh);
-	Mux16(a=in,b=in,sel=c,out=outd,out=outc);
-	Add16(a=gate,b[0]=b,out=outa,out=outb);
-	Mux8Way16(a=outa,b=outb,c=outc,d=outd,e=oute,f=outf,g=outg,h=outh,sel[2]=reset,sel[1]=load,sel[0]=inc,out=out1);
-	Register(in=out1,load=true,out=out,out=gate);
+	Inc16(in=gate,out=outB);
+	Mux16(a=gate,b=outB,sel=inc,out=out1);
+	Mux16(a=out1,b=in,sel=load,out=out2);
+	Mux16(a=out2,b=false,sel=reset,out=out3);
+	Register(in=out3,load=true,out=out,out=gate);
 }
