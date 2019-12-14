@@ -40,16 +40,34 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+	
+	//A Register
 	Not(in=instruction[15],out=c);
 	Or(a=c,b=instruction[5],out=c0);
 	Mux16(a=gate,b=instruction,sel=c,out=out1);
 	ARegister(in=out1,load=c0,out=A,out[0..14]=addressM);
+	
+	//D Register
 	And(a=instruction[15],b=instruction[4],out=c1);
 	DRegister(in=gate,load=c1,out=D);
+	
+	//ALU
 	Mux16(a=A,b=inM,sel=instruction[12],out=out2);
 	ALU(x=D,y=out2,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6],out=outM,out=gate,zr=zr,ng=ng);
+	
+	//WriteM bit
 	And(a=instruction[15],b=instruction[3],out=writeM,out=c2);
-	Load(zr=zr,ng=ng,address=instruction[0..2],out=c3);
-	And(a=instruction[15],b=c3,out=c4);
-	PC(in=A,load=c4,reset=reset,inc=true,out[0..14]=pc);
+	
+	//Check jumping condition
+	Or(a=zr,b=ng,out=notpos);
+    Not(in=notpos,out=pos);
+    And(a=instruction[0],b=pos,out=j1);//jump when out is positive
+    And(a=instruction[1],b=zr,out=j2);//jump when out is zero
+    And(a=instruction[2],b=ng,out=j3);//jump when out is negative
+    Or(a=j1,b=j2,out=j12);
+    Or(a=j12,b=j3,out=j123);
+    And(a=j123,b=instruction[15],out=jump);//jump ony when C-instruction
+	
+	//Next instruction(PC)
+	PC(in=A,load=jump,reset=reset,inc=true,out[0..14]=pc);
 }
