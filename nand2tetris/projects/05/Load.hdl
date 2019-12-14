@@ -1,20 +1,28 @@
+/**
+ * The Load chip checks the ALU output and considers where there is a jump or not. 
+ *	Load chip:
+ *	Adress		jump
+ *	000			no jump
+ *	001			if out>0 then jump
+ *	010			if out=0 then jump
+ *	011			if out>=0 then jump
+ *	100			if out<0 then jump
+ *	101			if out!=0 then jump
+ *	110			if out<=0 then jump
+ *	111			Unconditional jump
+ */
+
 CHIP Load {
 
 	IN zr,ng,address[3];
 	OUT out;
 	
 	PARTS:
-	Not(in=zr,out=out5);
-	Not(in=out5,out=out2);
-	Not(in=ng,out=out3);
-	Not(in=out3,out=out4);
-	And(a=out5,b=out3,out=out1);
-	Not(in=out1,out=out6);
-	Mux(a=false,b=out1,sel=address[0],out=a);
-	Mux(a=out2,b=out3,sel=address[0],out=b);
-	Mux(a=out4,b=out5,sel=address[0],out=c);
-	Mux(a=out6,b=true,sel=address[0],out=d);
-	Mux(a=a,b=b,sel=address[1],out=p);
-	Mux(a=c,b=d,sel=address[1],out=q);
-	Mux(a=p,b=q,sel=address[2],out=out);
+	Or(a=zr,b=ng,out=notpos);
+    Not(in=notpos,out=pos);
+    And(a=address[0],b=pos,out=j1);//jump when out is positive
+    And(a=address[1],b=zr,out=j2);//jump when out is zero
+    And(a=address[2],b=ng,out=j3);//jump when out is negative
+    Or(a=j1,b=j2,out=j12);
+    Or(a=j12,b=j3,out=out);
 }
